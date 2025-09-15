@@ -77,7 +77,7 @@ export const useNotesStore = create((set, get) => ({
           note._id === id ? res.data.note : note
         ),
       });
-      useNotesStore.getState().fetchNotes();
+      await useNotesStore.getState().fetchNotes();
 
       toast.success("Note updated");
       return true;
