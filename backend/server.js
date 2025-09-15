@@ -33,7 +33,7 @@ app.get("/health", (req, res) => {
 // mount routes
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", noteRoutes);
-app.use("/api/upgrade", upgradeRoutes);
+app.use("/api/tenant", upgradeRoutes);
 
 const PORT = process.env.PORT || 5000;
 

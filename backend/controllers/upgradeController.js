@@ -4,7 +4,7 @@ export async function upgradePlan(req, res) {
   try {
     const { slug } = req.params;
 
-    if (req.user.slug !== slug) {
+    if (req.tenant.slug !== slug) {
       return res.status(403).json({ message: "Forbidden - Not authorized" });
     }
 

@@ -3,16 +3,19 @@ import { getAxiosErrorMessage } from "@/utils/getAxiosErrorMessage.js";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
-export const useNotesStore = create((set,get) => ({
+export const useNotesStore = create((set, get) => ({
   notes: [],
   isLoading: true,
   isSubmitting: false,
+  limitReached: false,
+  isUpdating: false,
 
   fetchNotes: async () => {
     try {
       const res = await axiosInstance.get("/notes/all");
 
       set({ notes: res.data.notes });
+      set({ limitReached: false });
     } catch (error) {
       const message = getAxiosErrorMessage(error);
       console.log("Error in fetchNotes:", message);
@@ -30,15 +33,19 @@ export const useNotesStore = create((set,get) => ({
       const res = await axiosInstance.post("/notes/create", data);
 
       set({ notes: [res.data.note, ...get().notes] });
+      set({ limitReached: false });
 
       toast.success("Note created");
     } catch (error) {
       const message = getAxiosErrorMessage(error);
       console.log("Error in createNote:", message);
 
-      set({ notes: [] });
-
-      toast.error("Note creation failed");
+      // set({ notes: [] });
+      if (message.toLowerCase().includes("limit reached")) {
+        set({ limitReached: true });
+      } else {
+        toast.error(message);
+      }
     } finally {
       set({ isSubmitting: false });
     }
@@ -60,7 +67,7 @@ export const useNotesStore = create((set,get) => ({
   },
 
   updateNote: async (id, data) => {
-    set({ isSubmitting: true });
+    set({ isUpdating: true });
 
     try {
       const res = await axiosInstance.put(`/notes/${id}`, data);
@@ -70,15 +77,18 @@ export const useNotesStore = create((set,get) => ({
           note._id === id ? res.data.note : note
         ),
       });
+      useNotesStore.getState().fetchNotes();
 
       toast.success("Note updated");
+      return true;
     } catch (error) {
       const message = getAxiosErrorMessage(error);
       console.log("Error in updateNote:", message);
 
       toast.error("Note update failed");
+      return false;
     } finally {
-      set({ isSubmitting: false });
+      set({ isUpdating: false });
     }
   },
 }));

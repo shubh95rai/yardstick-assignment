@@ -11,7 +11,7 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between fixed w-full top-0 z-10 shadow-md h-16 px-6 bg-white">
       {/* left side */}
-      <div className="flex items-end gap-4">
+      <div className="flex items-center gap-4">
         <Link to="/" className="text-lg font-bold">
           Notes App
         </Link>
